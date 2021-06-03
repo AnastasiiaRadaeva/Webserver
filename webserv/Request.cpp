@@ -35,12 +35,14 @@ size_t  Request::processRequest(std::string &str)
     std::string new_str;
 
     if (_status_of_parts[0] == WAITING)
-    {
-        if ((pos_end = str.find(END)) != str.npos) // разобраться, сколько тут раз это повторяется
+    {        
+        if ((pos_end = str.find(NEXT_STR)) != str.npos) // разобраться, сколько тут раз это повторяется
+        {
             _status_of_parts[0] = OK;
-        new_str = std::string(str, pos_begin, pos_end - pos_begin);
-        filling_request_line(new_str);
-        pos_begin = pos_end + 4;
+            new_str = std::string(str, 0, pos_end);
+            filling_request_line(new_str);
+            pos_begin = pos_end + 2;
+        }
     }
     if (_status_of_parts[1] == WAITING && _status_of_parts[0] == OK)
     {

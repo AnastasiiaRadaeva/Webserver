@@ -21,6 +21,8 @@
 # define WAITING 1
 # define ERROR 2
 # define END "\r\n\r\n"
+# define NEXT_STR "\r\n"
+
 //посмотреть, какого рода ошибки могут быть и как они отображаются
 
 class Request
