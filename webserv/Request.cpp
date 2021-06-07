@@ -37,28 +37,30 @@ Request::~Request()
 
 size_t  Request::processRequest(std::string &str)
 {
-    size_t  pos_begin = 0;
+    // size_t  pos_begin = 0;
     size_t  pos_end = 0;
+    // size_t  pos_first_char = 2;
 
     if (_status_of_parts[0] == WAITING)
     {
-        pos_end = str.find(NEXT_STR);
-        _buff = std::string(str, pos_begin, pos_end);
-        if (pos_end != str.npos)
+        _buff += std::string(str, 0, str.npos);
+        if ((pos_end = _buff.find(NEXT_STR)) != _buff.npos)
         {
             _status_of_parts[0] = OK;
             filling_request_line();
-            pos_begin = pos_end + 2;
+            _buff.erase(0, pos_end + 2);
         }
     }
-    // if (_status_of_parts[1] == WAITING && _status_of_parts[0] == OK)
-    // {
-    //     if ((pos_end = str.find(END, pos_begin)) != str.npos)
-    //         _status_of_parts[1] = OK;
-    //     new_str = std::string(str, pos_begin, pos_end - pos_begin);
-    //     filling_headers(new_str);
-    //     pos_begin = pos_end + 4;
-    // }
+    if (_status_of_parts[1] == WAITING && _status_of_parts[0] == OK)
+    {
+        // _buff += std::string(str, 0, str.npos); нужно добавлять только если я не из первого if
+        if ((pos_end = _buff.find(END)) != _buff.npos)
+        {
+            _status_of_parts[1] = OK;
+            filling_headers();
+            _buff.erase(0, pos_end + 4);
+        }
+    }
     // if (_status_of_parts[2] == WAITING && _status_of_parts[0] == OK && _status_of_parts[1] == OK)
     // {
     //     //в хедерах я должна понять, будет ли тело и поменять статус тела на нужный 
@@ -83,14 +85,15 @@ void    Request::filling_request_line()
     size_t  pos_space = 0;
     size_t  pos_begin = 0;
     size_t  i = 0;
-    while ((pos_space = _buff.find(' ', pos_begin)) != _buff.npos)
+    std::string new_str(_buff, 0, _buff.find(NEXT_STR));
+    while ((pos_space = new_str.find(' ', pos_begin)) != new_str.npos)
     {
-        _request_line.push_back(std::string(_buff, pos_begin, pos_space - pos_begin));
+        _request_line.push_back(std::string(new_str, pos_begin, pos_space - pos_begin));
         pos_begin = pos_space + 1;
         i++;
     }
     if (i == 2)
-        _request_line.push_back(std::string(_buff, pos_begin, pos_space - pos_begin));
+        _request_line.push_back(std::string(new_str, pos_begin, pos_space - pos_begin));
     else
     {
         _status_of_parts[0] = ERROR;
