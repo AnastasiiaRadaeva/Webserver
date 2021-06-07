@@ -16,6 +16,7 @@
 # include <vector>
 # include <map>
 # include <string>
+# include <iostream>
 
 # define OK 0
 # define WAITING 1
@@ -29,26 +30,28 @@ class Request
 {
     public:
         Request();
-        Request(std::string &);
         Request(Request const &);
         Request &operator=(Request const &);
         ~Request();
 
-        std::vector<std::string> const              &getRequestLine();
+        std::string const                           &getMethod();
+        std::string const                           &getURI();
+        std::string const                           &getVersion();
         std::map<std::string, std::string> const    &getHeaders();
         std::string const                           &getBody();
 
         size_t  processRequest(std::string &);
 
     private:
+        std::string                         _buff;
         std::vector<std::string>            _request_line;
         std::map<std::string, std::string>  _headers;
         std::string                         _body;
         size_t                              _status;
         std::vector<size_t>                 _status_of_parts;
 
-        void    filling_request_line(std::string &);
-        void    filling_headers(std::string &);
+        void    filling_request_line();
+        void    filling_headers();
 
         
 
